@@ -1,3 +1,14 @@
+# ArgoCD Application 配置
+# 
+# 说明：
+# - 如果是在 ArgoCD UI 中手动创建的应用，这个文件是可选的
+# - 但建议保留，作为配置的备份和文档
+# - 可以用于版本控制、团队共享、快速重建应用
+#
+# 使用方法：
+# - 如果需要用这个文件创建/更新应用：kubectl apply -f argocd-application.yaml
+# - 如果应用已在 UI 中创建，这个文件仅作为参考文档
+
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -12,8 +23,11 @@ spec:
     targetRevision: main  # 修改为你的分支名
     path: .
   destination:
-    server: https://kubernetes.default.svc
+    # server: https://kubernetes.default.svc
     namespace: default
+    # 注意：不能同时指定 name 和 server
+    # 如果使用 name，需要先在 ArgoCD 中注册集群
+    name: in-cluster  # 不要同时使用
   syncPolicy:
     automated:
       prune: true

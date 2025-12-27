@@ -32,11 +32,7 @@ kubectl port-forward svc/hello-app 8080:80
 
 ### 1. 创建 ArgoCD Application
 
-```bash
-kubectl apply -f argocd-application.yaml
-```
-
-或者通过 ArgoCD UI：
+**方式一：通过 ArgoCD UI（推荐）**
 1. 登录 ArgoCD
 2. 点击 "New App"
 3. 配置：
@@ -45,8 +41,21 @@ kubectl apply -f argocd-application.yaml
    - Sync Policy: `Manual` 或 `Automatic`
    - Repository URL: 你的 Git 仓库地址
    - Path: `.`
-   - Cluster: `in-cluster`
+   - Cluster: `in-cluster` 或 `https://kubernetes.default.svc`
    - Namespace: `default`
+
+**方式二：使用 YAML 文件（可选）**
+
+```bash
+# 如果应用已在 UI 中创建，这个文件仅作为配置参考
+# 如果需要用文件创建/更新应用：
+kubectl apply -f argocd-application.yaml
+```
+
+**注意**：`argocd-application.yaml` 文件是可选的，主要用于：
+- 配置备份和文档
+- 版本控制和团队共享
+- 快速重建应用
 
 ### 2. 同步应用
 
@@ -73,7 +82,13 @@ kubectl port-forward svc/hello-app 8080:80
 
 ## 更新应用
 
-修改 `configmap.yaml` 中的 HTML 内容，提交到 Git 仓库，ArgoCD 会自动检测并同步（如果配置了自动同步）。
+修改 `configmap.yaml` 中的 HTML 内容，提交到 Git 仓库，ArgoCD 会自动检测并同步。
+
+**自动同步说明**：
+- ✅ 已配置自动同步（`syncPolicy.automated`）
+- ⏱️ ArgoCD 每 3 分钟轮询一次 Git 仓库
+- 🚀 推送代码后，最多等待 3 分钟会自动同步
+- 📝 详细说明请查看 [AUTO_SYNC.md](./AUTO_SYNC.md)
 
 ## 验证 Kustomize 是否生效
 
