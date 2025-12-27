@@ -20,20 +20,22 @@ spec:
         image: nginx:alpine
         ports:
         - containerPort: 80
+        env:
+        - name: APP_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: hello-env-config
+              key: APP_NAME
+        - name: DEPLOYED_BY
+          valueFrom:
+            configMapKeyRef:
+              name: hello-env-config
+              key: DEPLOYED_BY
         volumeMounts:
         - name: html
           mountPath: /usr/share/nginx/html
-      env:
-      - name: APP_NAME
-        valueFrom:
-          configMapKeyRef:
-            name: hello-env-config
-            key: APP_NAME
-      - name: DEPLOYED_BY
-        valueFrom:
-          configMapKeyRef:
-            name: hello-env-config
-            key: DEPLOYED_BY
+        - name: env-config
+          mountPath: /etc/config
       volumes:
       - name: html
         configMap:

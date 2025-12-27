@@ -45,4 +45,15 @@ data:
         </div>
     </body>
     </html>
-
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hello-env-config
+  namespace: default
+data:
+  APP_NAME: hello-app
+  DEPLOYED_BY: ArgoCD
+  KUSTOMIZE_VERSION: v1.0.0
+  DEPLOY_TIME: "2025-12-27"
+  ENVIRONMENT: production
