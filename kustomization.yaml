@@ -19,15 +19,13 @@ configMapGenerator:
       - KUSTOMIZE_VERSION=v1.0.0
       - DEPLOY_TIME=2025-12-27
       - ENVIRONMENT=production
-    # 添加标签，用于验证
-    labels:
-      app: hello-app
-      generated-by: kustomize
-      managed-by: argocd
+    # 注意：configMapGenerator 不支持 labels 字段
+    # 标签会通过 commonLabels 自动应用到生成的 ConfigMap
 
 commonLabels:
   app: hello-app
   managed-by: argocd
+  generated-by: kustomize  # 这个标签会自动应用到所有资源，包括生成的 ConfigMap
 
 # 添加命名空间（可选）
 namespace: default
