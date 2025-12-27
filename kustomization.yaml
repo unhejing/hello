@@ -22,12 +22,14 @@ resources:
 commonAnnotations:
   argocd.argoproj.io/sync-wave: "0"
   managed-by: argocd
-  generated-by: "helm+kustomize"
+  generated-by: "helm-kustomize"
 
 # 添加 labels 到所有资源
-commonLabels:
-  managed-by: argocd
-  generated-by: "helm+kustomize"
+# 注意：不要使用 commonLabels，因为它会应用到 selector，可能导致不可变错误
+# 使用 patches 单独为每个资源添加 labels
+# commonLabels:
+#   managed-by: argocd
+#   generated-by: "helm-kustomize"
 
 # 命名空间
 namespace: default
@@ -46,10 +48,13 @@ patches:
         value: "1"
       - op: replace
         path: /metadata/annotations/generated-by
-        value: "helm+kustomize"
-      - op: replace
+        value: "helm-kustomize"
+      - op: add
+        path: /metadata/labels/managed-by
+        value: "argocd"
+      - op: add
         path: /metadata/labels/generated-by
-        value: "helm+kustomize"
+        value: "helm-kustomize"
   - target:
       kind: Service
       name: hello-app
@@ -59,7 +64,10 @@ patches:
         value: "default"
       - op: replace
         path: /metadata/annotations/generated-by
-        value: "helm+kustomize"
-      - op: replace
+        value: "helm-kustomize"
+      - op: add
+        path: /metadata/labels/managed-by
+        value: "argocd"
+      - op: add
         path: /metadata/labels/generated-by
-        value: "helm+kustomize"
+        value: "helm-kustomize"
