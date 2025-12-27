@@ -23,16 +23,12 @@ spec:
     targetRevision: main  # 修改为你的分支名
     path: .
     # 使用 Helm + Kustomize 组合
-    # 关键：需要同时指定 helm 和 kustomize
-    helm:
-      releaseName: hello-app
-      # 如果需要指定 values 文件
-      # valueFiles:
-      #   - values.yaml
-    # Kustomize 会对 Helm 生成的资源进行处理
-    # kustomization.yaml 中的 commonAnnotations 和 commonLabels 会应用到 Helm 生成的资源
+    # 重要：只指定 kustomize，不要指定 helm！
+    # kustomization.yaml 中使用 helmCharts 字段渲染 Helm Chart
     kustomize:
       # Kustomize 会自动读取 kustomization.yaml
+      # kustomization.yaml 中的 helmCharts 字段会渲染 Helm Chart
+      # 然后 commonAnnotations 和 commonLabels 会应用到渲染后的资源
     # 重要：需要在 ArgoCD ConfigMap 中启用 kustomize.buildOptions: --enable-helm
     # 执行: bash setup-helm-kustomize.sh
   destination:

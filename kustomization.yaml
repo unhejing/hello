@@ -3,19 +3,18 @@ kind: Kustomization
 
 # Helm + Kustomize 组合配置
 # 
-# 工作流程：
-# 1. ArgoCD 使用 Helm 渲染 Chart（Application 中指定了 helm）
-# 2. Kustomize 对 Helm 生成的资源添加 annotations 和 labels
-# 3. ArgoCD 同步最终资源到集群
+# 重要说明：
+# - helmCharts 字段不支持本地路径（.tgz 或目录）
+# - helmCharts 只支持远程仓库（repo + version）
+# - 对于本地 Chart，需要使用其他方式
 #
-# 注意：
-# - Application 中需要同时指定 helm 和 kustomize
-# - 需要在 ArgoCD ConfigMap 中启用 kustomize.buildOptions: --enable-helm
-# - 不要使用 helmCharts 字段（会导致重复渲染）
+# 当前方案：使用 resources 字段引用 Chart 目录
+# 但这种方式不会使用 Helm 渲染，而是直接使用 Kustomize 处理
+# 所以 annotations 和 labels 可能不会正确应用
 
-# 注意：resources 字段留空，ArgoCD 会自动使用 Helm 渲染的结果
-# 如果使用 helmCharts 字段，会导致资源重复渲染
-# resources: []
+# 方案：直接引用 Chart 目录（不推荐，但可以测试）
+resources:
+  - charts/hello
 
 # 添加 annotations 到所有资源
 commonAnnotations:
@@ -43,6 +42,12 @@ patches:
       - op: add
         path: /metadata/annotations/deployment.kubernetes.io~1revision
         value: "1"
+      - op: replace
+        path: /metadata/annotations/generated-by
+        value: "helm+kustomize"
+      - op: replace
+        path: /metadata/labels/generated-by
+        value: "helm+kustomize"
   - target:
       kind: Service
       name: hello-app
@@ -50,3 +55,9 @@ patches:
       - op: add
         path: /metadata/annotations/service.beta.kubernetes.io~1load-balancer-class
         value: "default"
+      - op: replace
+        path: /metadata/annotations/generated-by
+        value: "helm+kustomize"
+      - op: replace
+        path: /metadata/labels/generated-by
+        value: "helm+kustomize"
