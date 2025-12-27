@@ -8,9 +8,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/your-username/your-repo.git  # 修改为你的 Git 仓库地址
+    repoURL: https://github.com/unhejing/hello.git  # 修改为你的 Git 仓库地址
     targetRevision: main  # 修改为你的分支名
-    path: argocd/hello
+    path: .
   destination:
     server: https://kubernetes.default.svc
     namespace: default

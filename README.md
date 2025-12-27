@@ -16,8 +16,8 @@ hello/
 ## 手动部署
 
 ```bash
-# 应用所有资源
-kubectl apply -f argocd/hello/
+# 应用所有资源（在 hello 目录下执行）
+kubectl apply -f .
 
 # 查看部署状态
 kubectl get pods -l app=hello-app
@@ -33,7 +33,7 @@ kubectl port-forward svc/hello-app 8080:80
 ### 1. 创建 ArgoCD Application
 
 ```bash
-kubectl apply -f argocd/hello/argocd-application.yaml
+kubectl apply -f argocd-application.yaml
 ```
 
 或者通过 ArgoCD UI：
@@ -44,7 +44,7 @@ kubectl apply -f argocd/hello/argocd-application.yaml
    - Project: `default`
    - Sync Policy: `Manual` 或 `Automatic`
    - Repository URL: 你的 Git 仓库地址
-   - Path: `argocd/hello`
+   - Path: `.`
    - Cluster: `in-cluster`
    - Namespace: `default`
 
