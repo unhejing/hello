@@ -5,6 +5,12 @@ metadata:
   namespace: default
   labels:
     app: hello-app
+    managed-by: argocd
+    chart: hello
+    generated-by: "helm"
+  annotations:
+    managed-by: argocd
+    generated-by: "helm"
 spec:
   type: ClusterIP
   ports:

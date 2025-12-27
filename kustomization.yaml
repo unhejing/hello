@@ -1,49 +1,49 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-# 注意：这个 kustomization.yaml 用于对 Helm 生成的资源添加 annotations
+# Helm + Kustomize 组合配置
 # 
 # 工作流程：
-# 1. ArgoCD 识别为 Helm 应用（因为有 Chart.yaml）
-# 2. Helm 渲染 templates/ 目录生成 Kubernetes 资源
-# 3. Kustomize 对 Helm 生成的资源进行处理，添加 annotations 和 labels
+# 1. Kustomize 使用 helmCharts 字段渲染 Helm Chart
+# 2. Kustomize 对渲染后的资源添加 annotations 和 labels
+# 3. ArgoCD 同步最终资源到集群
 #
-# 注意：resources 字段不需要指定，ArgoCD 会自动使用 Helm 渲染的结果
-# 如果需要引用其他资源，可以在这里添加
-# resources:
-#   - additional-resource.yaml
+# 注意：需要在 ArgoCD ConfigMap 中启用 kustomize.buildOptions: --enable-helm
 
-# 动态生成 ConfigMap（用于环境变量）
-configMapGenerator:
-  - name: hello-env-config
-    literals:
-      - APP_NAME=hello-app
-      - DEPLOYED_BY=ArgoCD
-      - KUSTOMIZE_VERSION=v1.0.0
-      - DEPLOY_TIME=2025-12-27
-      - ENVIRONMENT=production
+# 使用 helmCharts 字段引用本地 Helm Chart
+helmCharts:
+  - name: hello
+    # 使用本地路径（相对于 kustomization.yaml）
+    # 如果 Chart 在 charts/ 目录下，使用: charts/hello
+    # 当前 Chart 在同一目录，使用: .
+    path: .
+    releaseName: hello-app
+    namespace: default
+    # 可选：指定 values 文件
+    # valuesFile: values.yaml
+    # 或者使用 valuesInline
+    # valuesInline:
+    #   replicaCount: 2
 
 # 添加 annotations 到所有资源
 commonAnnotations:
   argocd.argoproj.io/sync-wave: "0"
-  deployment.kubernetes.io/revision: "1"
   managed-by: argocd
   generated-by: "helm+kustomize"
 
-# 添加 labels
+# 添加 labels 到所有资源
 commonLabels:
-  app: hello-app
   managed-by: argocd
-  chart: hello
   generated-by: "helm+kustomize"
 
 # 命名空间
 namespace: default
 
-# 使用 patches 为特定资源添加 annotations
+# 使用 patches 为特定资源添加或修改配置
 patches:
   - target:
       kind: Deployment
+      name: hello-app
     patch: |-
       - op: add
         path: /metadata/annotations/argocd.argoproj.io~1sync-wave
@@ -53,8 +53,8 @@ patches:
         value: "1"
   - target:
       kind: Service
+      name: hello-app
     patch: |-
       - op: add
         path: /metadata/annotations/service.beta.kubernetes.io~1load-balancer-class
         value: "default"
-

@@ -3,6 +3,13 @@ kind: ConfigMap
 metadata:
   name: hello-html
   namespace: default
+  labels:
+    app: hello-app
+    managed-by: argocd
+    chart: hello
+  annotations:
+    managed-by: argocd
+    generated-by: "helm"
 data:
   index.html: |
     <!DOCTYPE html>
@@ -51,6 +58,13 @@ kind: ConfigMap
 metadata:
   name: hello-env-config
   namespace: default
+  labels:
+    app: hello-app
+    managed-by: argocd
+    chart: hello
+  annotations:
+    managed-by: argocd
+    generated-by: "helm"
 data:
   APP_NAME: hello-app
   DEPLOYED_BY: ArgoCD

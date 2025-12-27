@@ -5,6 +5,13 @@ metadata:
   namespace: default
   labels:
     app: hello-app
+    managed-by: argocd
+    chart: hello
+    generated-by: "helm"
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+    managed-by: argocd
+    generated-by: "helm"
 spec:
   replicas: 2
   selector:

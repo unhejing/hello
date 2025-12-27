@@ -23,13 +23,18 @@ spec:
     targetRevision: main  # 修改为你的分支名
     path: .
     # 使用 Helm + Kustomize 组合
+    # 关键：需要同时指定 helm 和 kustomize
     helm:
       releaseName: hello-app
       # 如果需要指定 values 文件
       # valueFiles:
       #   - values.yaml
     # Kustomize 会对 Helm 生成的资源进行处理
-    # 注意：需要在 ArgoCD ConfigMap 中启用 kustomize.buildOptions: --enable-helm
+    # 重要：需要在 ArgoCD ConfigMap 中启用 kustomize.buildOptions: --enable-helm
+    # 执行: bash setup-helm-kustomize.sh
+    kustomize:
+      # Kustomize 会自动读取 kustomization.yaml
+      # kustomization.yaml 中的 commonAnnotations 和 commonLabels 会应用到 Helm 生成的资源
   destination:
     # server: https://kubernetes.default.svc
     namespace: default
