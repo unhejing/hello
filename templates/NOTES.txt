@@ -1,0 +1,18 @@
+1. Get the application URL by running these commands:
+{{- if contains "NodePort" .Values.service.type }}
+  export NODE_PORT=$(kubectl get --namespace {{ .Values.namespace | default "default" }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "hello.fullname" . }})
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Values.namespace | default "default" }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+{{- else if contains "LoadBalancer" .Values.service.type }}
+     NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+           You can watch the status by running 'kubectl get --namespace {{ .Values.namespace | default "default" }} svc -w {{ include "hello.fullname" . }}'
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Values.namespace | default "default" }} {{ include "hello.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+  echo http://$SERVICE_IP:{{ .Values.service.port }}
+{{- else if contains "ClusterIP" .Values.service.type }}
+  kubectl port-forward svc/{{ include "hello.fullname" . }} {{ .Values.service.port }}:{{ .Values.service.port }} --namespace {{ .Values.namespace | default "default" }}
+  echo "Visit http://127.0.0.1:{{ .Values.service.port }}"
+{{- end }}
+
+2. View the application:
+   kubectl get pods -l app={{ include "hello.name" . }} --namespace {{ .Values.namespace | default "default" }}
+

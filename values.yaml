@@ -1,0 +1,23 @@
+replicaCount: 2
+
+image:
+  repository: nginx
+  tag: alpine
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+configMap:
+  html:
+    title: "Hello from ArgoCD"
+    message: "This is a test application deployed via ArgoCD"
+
+env:
+  appName: hello-app
+  deployedBy: ArgoCD
+  environment: production
+
+namespace: default
+

@@ -1,32 +1,50 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-metadata:
-  name: hello-app
-  namespace: default
+# 注意：这个 kustomization.yaml 用于对 Helm 生成的资源添加 annotations
+# 
+# 工作流程：
+# 1. ArgoCD 识别为 Helm 应用（因为有 Chart.yaml）
+# 2. Helm 渲染 templates/ 目录生成 Kubernetes 资源
+# 3. Kustomize 对 Helm 生成的资源进行处理，添加 annotations 和 labels
+#
+# 注意：resources 字段不需要指定，ArgoCD 会自动使用 Helm 渲染的结果
+# 如果需要引用其他资源，可以在这里添加
+# resources:
+#   - additional-resource.yaml
 
-resources:
-  - deployment.yaml
-  - service.yaml
-  - configmap.yaml
+# 添加 annotations 到所有资源
+commonAnnotations:
+  argocd.argoproj.io/sync-wave: "0"
+  deployment.kubernetes.io/revision: "1"
+  managed-by: argocd
+  generated-by: "helm+kustomize"
 
-# 动态生成 ConfigMap（用于验证 Kustomize 是否生效）
-configMapGenerator:
-  - name: hello-env-config
-    literals:
-      - APP_NAME=hello-app
-      - DEPLOYED_BY=ArgoCD
-      - KUSTOMIZE_VERSION=v1.0.0
-      - DEPLOY_TIME=2025-12-27
-      - ENVIRONMENT=production
-    # 注意：configMapGenerator 不支持 labels 字段
-    # 标签会通过 commonLabels 自动应用到生成的 ConfigMap
-
+# 添加 labels
 commonLabels:
   app: hello-app
   managed-by: argocd
-  generated-by: kustomize  # 这个标签会自动应用到所有资源，包括生成的 ConfigMap
+  chart: hello
+  generated-by: "helm+kustomize"
 
-# 添加命名空间（可选）
+# 命名空间
 namespace: default
+
+# 使用 patches 为特定资源添加 annotations
+patches:
+  - target:
+      kind: Deployment
+    patch: |-
+      - op: add
+        path: /metadata/annotations/argocd.argoproj.io~1sync-wave
+        value: "0"
+      - op: add
+        path: /metadata/annotations/deployment.kubernetes.io~1revision
+        value: "1"
+  - target:
+      kind: Service
+    patch: |-
+      - op: add
+        path: /metadata/annotations/service.beta.kubernetes.io~1load-balancer-class
+        value: "default"
 

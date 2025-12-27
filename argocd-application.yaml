@@ -22,6 +22,14 @@ spec:
     repoURL: https://github.com/unhejing/hello.git  # 修改为你的 Git 仓库地址
     targetRevision: main  # 修改为你的分支名
     path: .
+    # 使用 Helm + Kustomize 组合
+    helm:
+      releaseName: hello-app
+      # 如果需要指定 values 文件
+      # valueFiles:
+      #   - values.yaml
+    # Kustomize 会对 Helm 生成的资源进行处理
+    # 注意：需要在 ArgoCD ConfigMap 中启用 kustomize.buildOptions: --enable-helm
   destination:
     # server: https://kubernetes.default.svc
     namespace: default
