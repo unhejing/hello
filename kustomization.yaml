@@ -10,7 +10,25 @@ resources:
   - service.yaml
   - configmap.yaml
 
+# 动态生成 ConfigMap（用于验证 Kustomize 是否生效）
+configMapGenerator:
+  - name: hello-env-config
+    literals:
+      - APP_NAME=hello-app
+      - DEPLOYED_BY=ArgoCD
+      - KUSTOMIZE_VERSION=v1.0.0
+      - DEPLOY_TIME=2025-12-27
+      - ENVIRONMENT=production
+    # 添加标签，用于验证
+    labels:
+      app: hello-app
+      generated-by: kustomize
+      managed-by: argocd
+
 commonLabels:
   app: hello-app
   managed-by: argocd
+
+# 添加命名空间（可选）
+namespace: default
 

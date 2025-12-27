@@ -23,8 +23,22 @@ spec:
         volumeMounts:
         - name: html
           mountPath: /usr/share/nginx/html
+      env:
+      - name: APP_NAME
+        valueFrom:
+          configMapKeyRef:
+            name: hello-env-config
+            key: APP_NAME
+      - name: DEPLOYED_BY
+        valueFrom:
+          configMapKeyRef:
+            name: hello-env-config
+            key: DEPLOYED_BY
       volumes:
       - name: html
         configMap:
           name: hello-html
+      - name: env-config
+        configMap:
+          name: hello-env-config
 

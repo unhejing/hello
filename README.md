@@ -75,3 +75,28 @@ kubectl port-forward svc/hello-app 8080:80
 
 修改 `configmap.yaml` 中的 HTML 内容，提交到 Git 仓库，ArgoCD 会自动检测并同步（如果配置了自动同步）。
 
+## 验证 Kustomize 是否生效
+
+### 快速验证
+
+```bash
+# 1. 查看动态生成的 ConfigMap（Kustomize 会添加随机后缀）
+kubectl get configmap -n default | grep hello-env-config
+
+# 2. 查看 Pod 中的环境变量
+POD_NAME=$(kubectl get pods -n default -l app=hello-app -o jsonpath='{.items[0].metadata.name}')
+kubectl exec -n default $POD_NAME -- env | grep -E "APP_NAME|DEPLOYED_BY"
+
+# 3. 检查所有资源是否有 managed-by: argocd 标签
+kubectl get all -n default -l managed-by=argocd
+```
+
+### 在 ArgoCD UI 中验证
+
+1. 登录 ArgoCD UI
+2. 点击应用 `hello-app`
+3. 查看 "Source Type" 应该显示为 **"Kustomize"**（不是 "Directory"）
+4. 在 "Resource" 标签中，应该能看到 `hello-env-config-xxxxx` ConfigMap（动态生成的）
+
+详细验证方法请查看 [VERIFY.md](./VERIFY.md)
+
