@@ -30,11 +30,11 @@ spec:
       # valueFiles:
       #   - values.yaml
     # Kustomize 会对 Helm 生成的资源进行处理
-    # 重要：需要在 ArgoCD ConfigMap 中启用 kustomize.buildOptions: --enable-helm
-    # 执行: bash setup-helm-kustomize.sh
+    # kustomization.yaml 中的 commonAnnotations 和 commonLabels 会应用到 Helm 生成的资源
     kustomize:
       # Kustomize 会自动读取 kustomization.yaml
-      # kustomization.yaml 中的 commonAnnotations 和 commonLabels 会应用到 Helm 生成的资源
+    # 重要：需要在 ArgoCD ConfigMap 中启用 kustomize.buildOptions: --enable-helm
+    # 执行: bash setup-helm-kustomize.sh
   destination:
     # server: https://kubernetes.default.svc
     namespace: default

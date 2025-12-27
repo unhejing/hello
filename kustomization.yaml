@@ -4,26 +4,18 @@ kind: Kustomization
 # Helm + Kustomize 组合配置
 # 
 # 工作流程：
-# 1. Kustomize 使用 helmCharts 字段渲染 Helm Chart
-# 2. Kustomize 对渲染后的资源添加 annotations 和 labels
+# 1. ArgoCD 使用 Helm 渲染 Chart（Application 中指定了 helm）
+# 2. Kustomize 对 Helm 生成的资源添加 annotations 和 labels
 # 3. ArgoCD 同步最终资源到集群
 #
-# 注意：需要在 ArgoCD ConfigMap 中启用 kustomize.buildOptions: --enable-helm
+# 注意：
+# - Application 中需要同时指定 helm 和 kustomize
+# - 需要在 ArgoCD ConfigMap 中启用 kustomize.buildOptions: --enable-helm
+# - 不要使用 helmCharts 字段（会导致重复渲染）
 
-# 使用 helmCharts 字段引用本地 Helm Chart
-helmCharts:
-  - name: hello
-    # 使用本地路径（相对于 kustomization.yaml）
-    # 如果 Chart 在 charts/ 目录下，使用: charts/hello
-    # 当前 Chart 在同一目录，使用: .
-    path: .
-    releaseName: hello-app
-    namespace: default
-    # 可选：指定 values 文件
-    # valuesFile: values.yaml
-    # 或者使用 valuesInline
-    # valuesInline:
-    #   replicaCount: 2
+# 注意：resources 字段留空，ArgoCD 会自动使用 Helm 渲染的结果
+# 如果使用 helmCharts 字段，会导致资源重复渲染
+# resources: []
 
 # 添加 annotations 到所有资源
 commonAnnotations:
