@@ -24,11 +24,10 @@ spec:
     path: .
     # 使用 Helm + Kustomize 组合
     # 重要：只指定 kustomize，不要指定 helm！
-    # kustomization.yaml 中使用 helmCharts 字段渲染 Helm Chart
-    kustomize:
-      # Kustomize 会自动读取 kustomization.yaml
-      # kustomization.yaml 中的 helmCharts 字段会渲染 Helm Chart
-      # 然后 commonAnnotations 和 commonLabels 会应用到渲染后的资源
+    # Kustomize 会自动读取 kustomization.yaml
+    # kustomization.yaml 中的 resources 字段会引用 templates 目录下的 YAML 文件
+    # 然后 commonAnnotations 和 commonLabels 会应用到这些资源
+    kustomize: {}
     # 重要：需要在 ArgoCD ConfigMap 中启用 kustomize.buildOptions: --enable-helm
     # 执行: bash setup-helm-kustomize.sh
   destination:
